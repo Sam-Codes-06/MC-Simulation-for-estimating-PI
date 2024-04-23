@@ -309,15 +309,6 @@ class Dodecahedron():
         g1.glEnd()
 
 
-class Sphere:
-    def __init__(self, r):
-        self.status = 'sphere'
-        self.radius = r
-        self.volume = 4 * np.pi * r * r * r / 3
-        self.sphere = g2.gluNewQuadric()
-        self.lat, self.long = 40, 40
-
-
 class Points:
     def __init__(self, n, shape, com):
         self.status = 'point'
@@ -341,39 +332,40 @@ class Points:
         g1.glDisable(g1.GL_BLEND)
 
     def generate(self, shape, n):
-        for i in range(n):
-            r, t1, t2 = shape.radius_outer_circle * np.random.default_rng().uniform(0, 1) ** (1 / 3), \
-                        np.random.default_rng().uniform(0, 360) * np.pi / 180, \
-                        np.arccos(2 * np.random.default_rng().uniform(0, 1) - 1)
-            x, y, z = np.array([r * np.sin(t2) * np.cos(t1), r * np.sin(t2) * np.sin(t1), r * np.cos(t2)])
-            if self.com[0] > 0:
-                if x > 0:
-                    x *= -1
-            if self.com[0] < 0:
-                if x < 0:
-                    x *= -1
-            if self.com[1] > 0:
-                if y > 0:
-                    y *= -1
-            if self.com[1] < 0:
-                if y < 0:
-                    y *= -1
-            if self.com[2] > 0:
-                if z > 0:
-                    z *= -1
-            if self.com[2] < 0:
-                if z < 0:
-                    z *= -1
-            v = np.array([x, y, z])
-            if self.points[0][0] == None:
-                self.points[0][0], self.points[0][0], self.points[0][0] = v[0], v[1], v[2]
-            else:
-                self.points = np.append(self.points, [v], axis=0)
-            self.com = (self.com * len(self.points) + v) / (len(self.points) + 1)
-            if shape.status != 'cube':
-                if mpl.check_point_inside_solid(shape.surfaces, shape.vertices, v):
-                    self.points_inside_mesh += 1
-            elif shape.status == 'cube':
-                if -1. <= v[0] <= 1. and -1. <= v[1] <= 1. and -1. <= v[2] <= 1.:
-                    self.points_inside_mesh += 1
+        while n != 0:
+            r = shape.radius_outer_circle
+            x, y, z = np.random.default_rng().uniform(-r, r), np.random.default_rng().uniform(-r, r), \
+                      np.random.default_rng().uniform(-r, r)
+            if x * x + y * y + z * z <= shape.radius_outer_circle ** 2:
+                n -= 1
+                if self.com[0] > 0:
+                    if x > 0:
+                        x *= -1
+                if self.com[0] < 0:
+                    if x < 0:
+                        x *= -1
+                if self.com[1] > 0:
+                    if y > 0:
+                        y *= -1
+                if self.com[1] < 0:
+                    if y < 0:
+                        y *= -1
+                if self.com[2] > 0:
+                    if z > 0:
+                        z *= -1
+                if self.com[2] < 0:
+                    if z < 0:
+                        z *= -1
+                v = np.array([x, y, z])
+                if self.points[0][0] == None:
+                    self.points[0][0], self.points[0][0], self.points[0][0] = v[0], v[1], v[2]
+                else:
+                    self.points = np.append(self.points, [v], axis=0)
+                self.com = (self.com * len(self.points) + v) / (len(self.points) + 1)
+                if shape.status != 'cube':
+                    if mpl.check_point_inside_solid(shape.surfaces, shape.vertices, v):
+                        self.points_inside_mesh += 1
+                elif shape.status == 'cube':
+                    if -1. <= v[0] <= 1. and -1. <= v[1] <= 1. and -1. <= v[2] <= 1.:
+                        self.points_inside_mesh += 1
         self.timer.cancel()
