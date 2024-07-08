@@ -30,7 +30,6 @@ octahedron = graphics.Octahedron()
 icosahedron = graphics.Icosahedron()
 dodecahedron = graphics.Dodecahedron()
 shape = cube
-sphere = graphics.Sphere(shape.radius_outer_circle)
 find_pi = False
 points = graphics.Points(number_of_points, shape, np.array([0., 0., 0.]))
 total_points, value_of_pi = [], []
@@ -74,7 +73,6 @@ while run:
     graphics.make_display()
     points.draw()
     shape.draw()
-    sphere.draw()
     graphics.rotate(zoom, rx, ry, rz)
     pygame.display.flip()
     fps.tick(60)
